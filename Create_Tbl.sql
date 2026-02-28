@@ -27,7 +27,7 @@ CREATE TABLE Invoices (
         CHECK (status IN ('COMPLETED','PENDING','APPROVED','REJECTED')),
     created_by BIGINT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
-    updated_at DATETIME DEFAULT 
+    updated_at DATETIME DEFAULT NULL,
     FOREIGN KEY (created_by) REFERENCES Users(user_id)
 );
 
