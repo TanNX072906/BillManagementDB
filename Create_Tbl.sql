@@ -1,3 +1,24 @@
+﻿USE master;
+GO
+
+-- 1. Kiểm tra nếu Database đã tồn tại thì xóa
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'BillManagementDB')
+BEGIN
+    -- Ngắt toàn bộ kết nối đang hoạt động để có thể xóa DB
+    ALTER DATABASE BillManagementDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    
+    DROP DATABASE BillManagementDB;
+    PRINT 'Database cu da bi xoa.';
+END
+GO
+
+-- 2. Tạo mới Database
+CREATE DATABASE BillManagementDB;
+GO
+
+PRINT 'Database moi da duoc tao thanh cong.';
+USE BillManagementDB;
+GO
 CREATE TABLE Users (
     user_id BIGINT PRIMARY KEY IDENTITY(1,1),
     username VARCHAR(50) NOT NULL UNIQUE,
