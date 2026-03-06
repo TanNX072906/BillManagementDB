@@ -54,6 +54,29 @@ CREATE TABLE Shifts (
 
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
+-- Chạy lúc: ~15:54 Ngày 06/03/2026
+-- Đảm bảo user_id 1, 2, 3 đã tồn tại trong bảng Users
+
+-- CHẠY LỆNH NÀY ĐỂ TẠO DATA MỚI (Đã set đầy đủ start_time và end_time cố định)
+
+INSERT INTO Shifts (user_id, shift_date, start_time, end_time, status)
+VALUES 
+    -- 1. Ca hành chính hôm qua (Đã chốt)
+    (1, '2026-03-05', '2026-03-05 08:00:00', '2026-03-05 17:00:00', 'CLOSED'),
+
+    -- 2. Ca đêm qua (Vắt qua ngày hôm nay, đã chốt)
+    (2, '2026-03-05', '2026-03-05 22:00:00', '2026-03-06 06:00:00', 'CLOSED'),
+
+    -- 3. Ca sáng HÔM NAY (Đã kết thúc lúc 14h, đã chốt)
+    (3, '2026-03-06', '2026-03-06 06:00:00', '2026-03-06 14:00:00', 'CLOSED'),
+
+    -- 4. Ca chiều HÔM NAY (Đang diễn ra - OPEN)
+    -- Được lên lịch từ 14:00 đến 22:00. Lúc này là ~16h nên ca này đang OPEN hợp lý.
+    (1, '2026-03-06', '2026-03-06 14:00:00', '2026-03-06 22:00:00', 'OPEN'),
+
+    -- 5. Ca hành chính HÔM NAY (Đang diễn ra - OPEN)
+    -- Được lên lịch từ 08:00 đến 17:00. Vẫn đang trong giờ làm việc.
+    (2, '2026-03-06', '2026-03-06 08:00:00', '2026-03-06 17:00:00', 'OPEN');
 GO
 CREATE TABLE Invoices (
     invoice_id BIGINT PRIMARY KEY IDENTITY(1,1),
@@ -120,3 +143,8 @@ CREATE TABLE Alerts (
 );
 GO
 
+select * from Users
+select * from Invoices
+select * from Shifts
+
+go
