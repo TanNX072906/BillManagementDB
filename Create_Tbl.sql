@@ -72,11 +72,11 @@ VALUES
 
     -- 4. Ca chiều HÔM NAY (Đang diễn ra - OPEN)
     -- Được lên lịch từ 14:00 đến 22:00. Lúc này là ~16h nên ca này đang OPEN hợp lý.
-    (1, '2026-03-06', '2026-03-06 14:00:00', '2026-03-06 22:00:00', 'OPEN'),
+    (1, '2026-03-07', '2026-03-07 14:00:00', '2026-03-07 22:00:00', 'CLOSED'),
 
     -- 5. Ca hành chính HÔM NAY (Đang diễn ra - OPEN)
     -- Được lên lịch từ 08:00 đến 17:00. Vẫn đang trong giờ làm việc.
-    (2, '2026-03-06', '2026-03-06 08:00:00', '2026-03-06 17:00:00', 'OPEN');
+    (2, '2026-03-07', '2026-03-07 08:00:00', '2026-03-07 17:00:00', 'CLOSED');
 GO
 CREATE TABLE Invoices (
     invoice_id BIGINT PRIMARY KEY IDENTITY(1,1),
