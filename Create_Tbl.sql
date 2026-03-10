@@ -83,7 +83,7 @@ CREATE TABLE Invoices (
     invoice_code VARCHAR(50) NOT NULL UNIQUE,
     amount DECIMAL(15,2) NOT NULL,
     status VARCHAR(20) DEFAULT 'PENDING'
-        CHECK (status IN ('COMPLETED','PENDING','APPROVED','REJECTED')),
+        CHECK (status IN ('COMPLETED','PENDING','APPROVED','REJECTED', 'DELETED')),
     created_by BIGINT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT NULL,
