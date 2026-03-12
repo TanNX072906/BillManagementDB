@@ -169,5 +169,8 @@ GO
 select * from Users
 select * from Invoices
 select * from Shifts
-
+select * from Invoice_Details
+select * from Products
+select * from Alerts
+select * from Activity_Logs
 go
