@@ -27,7 +27,7 @@ CREATE TABLE Users (
     role VARCHAR(20) NOT NULL 
         CHECK (role IN ('ADMIN','STAFF','AUDITOR')),
     status VARCHAR(20) DEFAULT 'ACTIVE'
-        CHECK (status IN ('ACTIVE','LOCKED')),
+        CHECK (status IN ('ACTIVE','LOCKED','OFFLINE')),
     created_at DATETIME DEFAULT GETDATE()
 );
 -- Thêm User Quản trị
@@ -167,8 +167,9 @@ CREATE TABLE Alerts (
 GO
 
 select * from Users
-select * from Invoices
 select * from Shifts
+select * from Invoices
+
 select * from Invoice_Details
 select * from Products
 select * from Alerts
