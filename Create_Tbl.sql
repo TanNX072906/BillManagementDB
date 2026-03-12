@@ -115,6 +115,29 @@ CREATE TABLE Invoice_History (
 );
 GO
 
+CREATE TABLE Products (
+    product_id BIGINT PRIMARY KEY IDENTITY(1,1),
+    product_name NVARCHAR(255) NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME
+);
+GO
+
+CREATE TABLE Invoice_Details (
+    detail_id BIGINT PRIMARY KEY IDENTITY(1,1),
+    invoice_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(15,2) NOT NULL, -- Giá tại thời điểm mua
+    total_price DECIMAL(15,2) NOT NULL, -- quantity * unit_price
+    
+    FOREIGN KEY (invoice_id) REFERENCES Invoices(invoice_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+GO
+
 CREATE TABLE Activity_Logs (
     log_id BIGINT PRIMARY KEY IDENTITY(1,1),
     user_id BIGINT NOT NULL,
