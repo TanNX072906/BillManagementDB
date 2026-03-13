@@ -27,7 +27,7 @@ CREATE TABLE Users (
     role VARCHAR(20) NOT NULL 
         CHECK (role IN ('ADMIN','STAFF','AUDITOR')),
     status VARCHAR(20) DEFAULT 'ACTIVE'
-        CHECK (status IN ('ACTIVE','LOCKED','OFFLINE')),
+        CHECK (status IN ('ONLINE','LOCKED','OFFLINE')),
     created_at DATETIME DEFAULT GETDATE()
 );
 -- Thêm User Quản trị
