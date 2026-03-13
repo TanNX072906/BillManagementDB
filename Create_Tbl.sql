@@ -26,21 +26,21 @@ CREATE TABLE Users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL 
         CHECK (role IN ('ADMIN','STAFF','AUDITOR')),
-    status VARCHAR(20) DEFAULT 'ACTIVE'
+    status VARCHAR(20) DEFAULT 'OFFLINE'
         CHECK (status IN ('ONLINE','LOCKED','OFFLINE')),
     created_at DATETIME DEFAULT GETDATE()
 );
 -- Thêm User Quản trị
 INSERT INTO Users (username, password, role, status, created_at)
-VALUES ('a', '1', 'ADMIN', 'ACTIVE', GETDATE());
+VALUES ('a', '1', 'ADMIN', 'OFFLINE', GETDATE());
 
 -- Thêm User Nhân viên
 INSERT INTO Users (username, password, role, status, created_at)
-VALUES ('staff_01', 'staff456', 'STAFF', 'ACTIVE', GETDATE());
+VALUES ('staff_01', 'staff456', 'STAFF', 'OFFLINE', GETDATE());
 
 -- Thêm User bị khóa (để test logic status)
 INSERT INTO Users (username, password, role, status, created_at)
-VALUES ('user_old', 'staff789', 'STAFF', 'LOCKED', '2025-01-01 08:00:00');
+VALUES ('user_old', 'staff789', 'STAFF', 'OFFLINE', '2025-01-01 08:00:00');
 GO
 
 CREATE TABLE Shifts (
