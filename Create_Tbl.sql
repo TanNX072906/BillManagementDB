@@ -79,7 +79,7 @@ CREATE TABLE Products (
     product_id BIGINT PRIMARY KEY IDENTITY(1,1),
     product_name NVARCHAR(255) NOT NULL,
     price DECIMAL(15,2) NOT NULL,
-    status VARCHAR(20) DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    status VARCHAR(20) DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'DELETED')),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME
 );
@@ -89,6 +89,7 @@ CREATE TABLE Invoice_Details (
     detail_id BIGINT PRIMARY KEY IDENTITY(1,1),
     invoice_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
+	product_name NVARCHAR(255) NOT NULL DEFAULT '',
     quantity INT NOT NULL CHECK (quantity > 0),
     unit_price DECIMAL(15,2) NOT NULL,
     total_price DECIMAL(15,2) NOT NULL, 
