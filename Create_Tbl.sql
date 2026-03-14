@@ -119,7 +119,7 @@ CREATE TABLE Alerts (
     risk_score INT,
     message VARCHAR(MAX),
     status VARCHAR(20) DEFAULT 'NEW'
-        CHECK (status IN ('NEW','INVESTIGATING','RESOLVED')),
+        CHECK (status IN ('NEW','RESOLVED')),
     created_at DATETIME DEFAULT GETDATE()
 );
 GO
