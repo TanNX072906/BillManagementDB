@@ -241,7 +241,7 @@ select * from Users
 =======
 =================================================================================
 SELECT 
-            i.invoice_id,
+    i.invoice_id,
     i.amount,
 
     DATEPART(HOUR, i.created_at) AS invoice_hour,
