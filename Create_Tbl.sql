@@ -89,7 +89,7 @@ CREATE TABLE Invoice_Details (
     detail_id BIGINT PRIMARY KEY IDENTITY(1,1),
     invoice_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
-	product_name NVARCHAR(255) NOT NULL DEFAULT '',
+    product_name NVARCHAR(255) NOT NULL DEFAULT '',
     quantity INT NOT NULL CHECK (quantity > 0),
     unit_price DECIMAL(15,2) NOT NULL,
     total_price DECIMAL(15,2) NOT NULL, 
@@ -130,7 +130,6 @@ GO
 -- 3. INSERT DỮ LIỆU DEMO (GỘP CHUNG TẤT CẢ)
 -- ====================================================================
 
-<<<<<<< Updated upstream
 -- 3.1 BẢNG USERS (ID 1 -> 7)
 INSERT INTO Users (username, password, role, status, created_at) VALUES 
 ('a', '1', 'ADMIN', 'OFFLINE', GETDATE()),                    -- ID 1
@@ -168,7 +167,7 @@ INSERT INTO Shifts (user_id, shift_date, start_time, end_time, status) VALUES
 (5, '2026-03-14', '2026-03-14 08:00:00', '2026-03-15 08:00:00', 'CLOSED'); -- ID 8
 GO
 
--- 3.4 BẢNG INVOICES (ID 1 -> 10) - Đã update mã Format
+-- 3.4 BẢNG INVOICES (ID 1 -> 10)
 INSERT INTO Invoices (invoice_code, amount, status, created_by, created_at, updated_at) VALUES 
 ('INV-20260301083000-001', 15000000.00, 'APPROVED',  1, '2026-03-01 08:30:00', GETDATE()),
 ('INV-20260302091500-002', 2550000.50,  'COMPLETED', 1, '2026-03-02 09:15:00', GETDATE()),
@@ -237,33 +236,32 @@ SELECT 'Alerts', COUNT(*) FROM Alerts
 UNION ALL
 SELECT 'Activity_Logs', COUNT(*) FROM Activity_Logs;
 GO
-select * from Users
-=======
-=================================================================================
+
+SELECT * FROM Users;
+GO
+
+-- ====================================================================
+-- 5. TRUY VẤN MỞ RỘNG
+-- ====================================================================
+
+-- 5.1: Phân tích Invoice & Phát hiện gian lận (Fraud Detection)
 SELECT 
     i.invoice_id,
     i.amount,
-
     DATEPART(HOUR, i.created_at) AS invoice_hour,
-
     CASE 
         WHEN DATENAME(WEEKDAY, i.created_at) IN ('Saturday','Sunday')
         THEN 'yes'
         ELSE 'no'
     END AS is_weekend,
-
     u.role AS user_role,
-
     ISNULL(s.status,'CLOSED') AS shift_status,
-
     i.status AS invoice_status,
-
     (
         SELECT COUNT(*)
         FROM Invoice_History h
         WHERE h.invoice_id = i.invoice_id
     ) AS edit_count,
-
     CASE
         WHEN EXISTS(
             SELECT 1
@@ -275,25 +273,24 @@ SELECT
         THEN 'yes'
         ELSE 'no'
     END AS duplicated_invoice,
-
     a.fraud_prediction AS fraud
-
 FROM Invoices i
+JOIN Users u ON i.created_by = u.user_id
+LEFT JOIN Shifts s ON s.user_id = i.created_by 
+    AND i.created_at BETWEEN s.start_time AND s.end_time
+LEFT JOIN Alerts a ON a.entity_type = 'INVOICE' 
+    AND a.entity_id = i.invoice_id;
+GO
 
-JOIN Users u 
-ON i.created_by = u.user_id
-
-LEFT JOIN Shifts s
-ON s.user_id = i.created_by
-AND i.created_at BETWEEN s.start_time AND s.end_time
-
-LEFT JOIN Alerts a
-ON a.entity_type = 'INVOICE'
-AND a.entity_id = i.invoice_id
+-- 5.2: Danh sách Invoice của User có ID = 1
 SELECT i.invoice_id, i.invoice_code, u.username
 FROM Invoices i
 JOIN Users u ON i.created_by = u.user_id
 WHERE u.user_id = 1;
+GO
+
+-- 5.3: Lấy danh sách ID Invoice được tạo bởi User ID = 1
 SELECT invoice_id
 FROM Invoices
-WHERE created_by = 1
+WHERE created_by = 1;
+GO
