@@ -129,6 +129,7 @@ GO
 -- 3. INSERT DỮ LIỆU DEMO (GỘP CHUNG TẤT CẢ)
 -- ====================================================================
 
+<<<<<<< Updated upstream
 -- 3.1 BẢNG USERS (ID 1 -> 7)
 INSERT INTO Users (username, password, role, status, created_at) VALUES 
 ('a', '1', 'ADMIN', 'OFFLINE', GETDATE()),                    -- ID 1
@@ -236,3 +237,27 @@ UNION ALL
 SELECT 'Activity_Logs', COUNT(*) FROM Activity_Logs;
 GO
 select * from Users
+=======
+=================================================================================
+SELECT 
+            i.amount,
+            DATEPART(HOUR, i.created_at) AS invoice_hour,
+            i.status,
+            CASE 
+                WHEN DATENAME(WEEKDAY, i.created_at) IN ('Saturday','Sunday')
+                THEN 'yes'
+                ELSE 'no'
+            END AS is_weekend,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM Invoices i2
+                    WHERE i2.invoice_code = i.invoice_code
+                    AND i2.invoice_id <> i.invoice_id
+                )
+                THEN 'yes'
+                ELSE 'no'
+            END AS duplicated_invoice
+        FROM Invoices i
+go
+>>>>>>> Stashed changes
