@@ -29,7 +29,7 @@ CREATE TABLE Users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL 
         CHECK (role IN ('ADMIN','STAFF','AUDITOR')),
-    status VARCHAR(20) DEFAULT 'ONLINE'
+    status VARCHAR(20) DEFAULT 'OFFLINE'
         CHECK (status IN ('ONLINE','LOCKED','OFFLINE')),
     created_at DATETIME DEFAULT GETDATE()
 );
@@ -121,7 +121,8 @@ CREATE TABLE Alerts (
     message VARCHAR(MAX),
     status VARCHAR(20) DEFAULT 'NEW'
         CHECK (status IN ('NEW','RESOLVED')),
-    created_at DATETIME DEFAULT GETDATE()
+    created_at DATETIME DEFAULT GETDATE(),
+    fraud_prediction NVARCHAR(10) DEFAULT NULL CHECK (fraud_prediction IN ('yes', 'no'))
 );
 GO
 
@@ -240,24 +241,59 @@ select * from Users
 =======
 =================================================================================
 SELECT 
-            i.amount,
-            DATEPART(HOUR, i.created_at) AS invoice_hour,
-            i.status,
-            CASE 
-                WHEN DATENAME(WEEKDAY, i.created_at) IN ('Saturday','Sunday')
-                THEN 'yes'
-                ELSE 'no'
-            END AS is_weekend,
-            CASE 
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM Invoices i2
-                    WHERE i2.invoice_code = i.invoice_code
-                    AND i2.invoice_id <> i.invoice_id
-                )
-                THEN 'yes'
-                ELSE 'no'
-            END AS duplicated_invoice
-        FROM Invoices i
-go
->>>>>>> Stashed changes
+            i.invoice_id,
+    i.amount,
+
+    DATEPART(HOUR, i.created_at) AS invoice_hour,
+
+    CASE 
+        WHEN DATENAME(WEEKDAY, i.created_at) IN ('Saturday','Sunday')
+        THEN 'yes'
+        ELSE 'no'
+    END AS is_weekend,
+
+    u.role AS user_role,
+
+    ISNULL(s.status,'CLOSED') AS shift_status,
+
+    i.status AS invoice_status,
+
+    (
+        SELECT COUNT(*)
+        FROM Invoice_History h
+        WHERE h.invoice_id = i.invoice_id
+    ) AS edit_count,
+
+    CASE
+        WHEN EXISTS(
+            SELECT 1
+            FROM Invoices i2
+            WHERE i2.created_by = i.created_by
+            AND ABS(DATEDIFF(MINUTE,i2.created_at,i.created_at)) < 2
+            AND i2.invoice_id <> i.invoice_id
+        )
+        THEN 'yes'
+        ELSE 'no'
+    END AS duplicated_invoice,
+
+    a.fraud_prediction AS fraud
+
+FROM Invoices i
+
+JOIN Users u 
+ON i.created_by = u.user_id
+
+LEFT JOIN Shifts s
+ON s.user_id = i.created_by
+AND i.created_at BETWEEN s.start_time AND s.end_time
+
+LEFT JOIN Alerts a
+ON a.entity_type = 'INVOICE'
+AND a.entity_id = i.invoice_id
+SELECT i.invoice_id, i.invoice_code, u.username
+FROM Invoices i
+JOIN Users u ON i.created_by = u.user_id
+WHERE u.user_id = 1;
+SELECT invoice_id
+FROM Invoices
+WHERE created_by = 1
