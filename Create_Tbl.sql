@@ -42,7 +42,6 @@ VALUES ('staff_01', 'staff456', 'STAFF', 'ACTIVE', GETDATE());
 INSERT INTO Users (username, password, role, status, created_at)
 VALUES ('user_old', 'staff789', 'STAFF', 'LOCKED', '2025-01-01 08:00:00');
 GO
-
 CREATE TABLE Shifts (
     shift_id BIGINT PRIMARY KEY IDENTITY(1,1),
     user_id BIGINT NOT NULL,
@@ -115,6 +114,32 @@ CREATE TABLE Invoice_History (
 );
 GO
 
+<<<<<<< Updated upstream
+=======
+CREATE TABLE Products (
+    product_id BIGINT PRIMARY KEY IDENTITY(1,1),
+    product_name NVARCHAR(255) NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    created_at DATETIME DEFAULT GETDATE(),
+    updated_at DATETIME
+);
+GO
+
+CREATE TABLE Invoice_Details (
+    detail_id BIGINT PRIMARY KEY IDENTITY(1,1),
+    invoice_id BIGINT NOT NULL, 
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(15,2) NOT NULL, -- Giá tại thời điểm mua
+    total_price DECIMAL(15,2) NOT NULL, -- quantity * unit_price
+    
+    FOREIGN KEY (invoice_id) REFERENCES Invoices(invoice_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+GO
+
+>>>>>>> Stashed changes
 CREATE TABLE Activity_Logs (
     log_id BIGINT PRIMARY KEY IDENTITY(1,1),
     user_id BIGINT NOT NULL,
@@ -139,12 +164,73 @@ CREATE TABLE Alerts (
     message VARCHAR(MAX),
     status VARCHAR(20) DEFAULT 'NEW'
         CHECK (status IN ('NEW','INVESTIGATING','RESOLVED')),
-    created_at DATETIME DEFAULT GETDATE()
+    created_at DATETIME DEFAULT GETDATE(),
+	fraud_prediction NVARCHAR(10) DEFAULT NULL CHECK (fraud_prediction IN ('yes', 'no'))
 );
+
 GO
 
 select * from Users
 select * from Invoices
 select * from Shifts
 
+<<<<<<< Updated upstream
 go
+=======
+select * from Invoice_Details
+select * from Products
+select * from Alerts
+select * from Activity_Logs
+
+
+SELECT 
+    i.invoice_id,
+    i.amount,
+
+    DATEPART(HOUR, i.created_at) AS invoice_hour,
+
+    CASE 
+        WHEN DATENAME(WEEKDAY, i.created_at) IN ('Saturday','Sunday')
+        THEN 'yes'
+        ELSE 'no'
+    END AS is_weekend,
+
+    u.role AS user_role,
+
+    ISNULL(s.status,'CLOSED') AS shift_status,
+
+    i.status AS invoice_status,
+
+    (
+        SELECT COUNT(*)
+        FROM Invoice_History h
+        WHERE h.invoice_id = i.invoice_id
+    ) AS edit_count,
+
+    CASE
+        WHEN EXISTS(
+            SELECT 1
+            FROM Invoices i2
+            WHERE i2.created_by = i.created_by
+            AND ABS(DATEDIFF(MINUTE,i2.created_at,i.created_at)) < 2
+            AND i2.invoice_id <> i.invoice_id
+        )
+        THEN 'yes'
+        ELSE 'no'
+    END AS duplicated_invoice,
+
+    a.fraud_prediction AS fraud
+
+FROM Invoices i
+
+JOIN Users u 
+ON i.created_by = u.user_id
+
+LEFT JOIN Shifts s
+ON s.user_id = i.created_by
+AND i.created_at BETWEEN s.start_time AND s.end_time
+
+LEFT JOIN Alerts a
+ON a.entity_type = 'INVOICE'
+AND a.entity_id = i.invoice_id
+>>>>>>> Stashed changes
